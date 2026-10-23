@@ -1,0 +1,126 @@
+{
+ "K_per_class": 3,
+ "rule": "generated: first K images of each class (shared test noise bank); real: K per class, rng seed 0",
+ "CMMD": {
+  "real": {
+   "file": "test_cache.npz",
+   "indices": [
+    201,
+    227,
+    272,
+    25,
+    31,
+    38
+   ]
+  },
+  "tc40": {
+   "file": "gen_tc40.npz",
+   "indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152
+   ],
+   "n_total": 300
+  },
+  "tcm0": {
+   "file": "gen_tcm0.npz",
+   "indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152
+   ],
+   "n_total": 300
+  },
+  "tcfp": {
+   "file": "gen_tcfp.npz",
+   "indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152
+   ],
+   "n_total": 300
+  },
+  "tc40_nl": {
+   "file": "gen_tc40_nl.npz",
+   "indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152
+   ],
+   "n_total": 300
+  }
+ },
+ "CBIS-DDSM": {
+  "real": {
+   "file": "test_cache.npz",
+   "indices": [
+    346,
+    434,
+    563,
+    12,
+    30,
+    57
+   ]
+  },
+  "tbm0": {
+   "file": "gen_tbm0.npz",
+   "indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152
+   ],
+   "n_total": 300
+  },
+  "tbfp": {
+   "file": "gen_tbfp.npz",
+   "indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152
+   ],
+   "n_total": 300
+  },
+  "tsm0": {
+   "file": "gen_tsm0.npz",
+   "indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152
+   ],
+   "n_total": 300
+  },
+  "tsnlf": {
+   "file": "gen_tsnlf.npz",
+   "indices": [
+    0,
+    1,
+    2,
+    150,
+    151,
+    152
+   ],
+   "n_total": 300
+  }
+ }
+}
