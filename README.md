@@ -18,8 +18,10 @@ The generator architecture and training recipe are **U24_synthesis** by Linardos
 https://doi.org/10.1038/s41598-026-58260-0, code: https://github.com/Linardos/U24_synthesis.
 Their original model was trained on EMBED. **Here the model was retrained from scratch on CBIS-DDSM and on CMMD; no
 pretrained weights from the original authors were used.** The U24_synthesis code is *not* redistributed in this repository:
-each notebook clones it at run time (from a fork, `Its-Me-Sk/U24_synthesis`, made to run it on Kaggle) and applies two small
-compatibility patches shown in Cell 1 (removing `xformers` from the requirements and fixing a hard-coded config path).
+each notebook clones it at run time from the fork https://github.com/Its-Me-Sk/U24_synthesis (forked from
+https://github.com/IUCompPath/U24_synthesis; the fork contains one additional commit, visible in its commit history) and
+then applies two small compatibility patches shown in Cell 1 (removing `xformers` from the requirements and fixing a
+hard-coded config path). All physics terms, evaluation code and data handling of this study are in this repository.
 
 ## Repository layout
 | folder | contents |
