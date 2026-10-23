@@ -1,0 +1,31 @@
+S8 REPORT - replication on CMMD + longer CBIS-DDSM training (rules: S8_preregistration.txt)
+====================================================================================================
+session 1 | jobs done 11/41 | failed [] | still to do ['fp_cbis90', 'm0_cbis90', 'gen_cavg', 'gen_bm0', 'gen_bfp', 'gen_b40', 'gen_b60', 'gen_b90', 'eval_S8_cmmd_fp_val', 'eval_S8_cmmd_main_val', 'eval_S8_cbis_fp_val', 'eval_S8_cbis_long_val', 'gen_tc40', 'gen_tcm0', 'gen_tcfp', 'gen_tcavg', 'gen_tbm0', 'gen_tbfp', 'noise_tc40', 'eval_S8_cmmd_fp_test', 'eval_S8_cmmd_main_test', 'eval_S8_cbis_fp_test', 'train_sep_m0', 'train_sep_nlf', 'gen_sm0', 'gen_snlf', 'gen_tsm0', 'gen_tsnlf', 'eval_S8_cbis_sep_val', 'eval_S8_cbis_sep_test']
+CMMD data: train {'images': 1775, 'benign': 874, 'malignant': 901, 'patients': 821} | test {'images': 438, 'benign': 214, 'malignant': 224, 'patients': 205} | resolution {'used': 2214}
+classifier cmmd_clf_s0.json: {'name': 'cmmd_clf_s0', 'val_auc': 0.763012035472973, 'n_train': 1499, 'n_val': 276}
+----------------------------------------------------------------------------------------------------
+TRAINING
+  cmmd_s42: 40 epochs | last loss 0.0274 mse 0.00667 | 8.6 min/epoch
+     mse by epoch: 1: 0.79109, 10: 0.00975, 20: 0.00788, 30: 0.00709, 40: 0.00667
+  base_clean_s42: 90 epochs | last loss 0.0303 mse 0.00534 | 11.1 min/epoch
+     mse by epoch: 1: 0.72645, 10: 0.00901, 20: 0.00739, 30: 0.00637, 40: 0.00589, 41: 0.00640, 42: 0.00621, 44: 0.00584, 50: 0.00616, 60: 0.00588, 70: 0.00612, 80: 0.00632, 90: 0.00534
+  cmmd_m0: 44 epochs | last loss 0.0277 mse 0.00697 | 9.6 min/epoch
+     mse by epoch: 41: 0.00736, 42: 0.00704, 44: 0.00697
+     FP term / clipped share by epoch: 41: None / 0.52, 42: None / 0.61, 43: None / 0.51, 44: None / 0.51
+  cmmd_l016: 42 epochs | last loss 0.0292 mse 0.00799 | 46.4 min/epoch
+     mse by epoch: 41: 0.00841, 42: 0.00799
+     FP term / clipped share by epoch: 41: 0.0948 / 0.61, 42: 0.0778 / 0.73
+  cl_m0: not started
+  cl_l016: not started
+  sref_cbis90.json: epoch 90 S_ref {'10': 1588.1844552822151, '15': 866.2097152850687, '20': 567.3250152129319, '30': 256.0099457271748, '50': 108.90374185635197, '75': 51.59921913324004, '100': 28.830383661809517, '150': 13.877998968422478, '200': 7.252295588555398, '250': 4.419727311981542, '300': 2.894035742343584}
+  sref_cmmd40.json: epoch 40 S_ref {'10': 1776.4697997482028, '15': 919.9373724692953, '20': 571.9994921265059, '30': 289.68006855011333, '50': 116.66300615344585, '75': 54.12029187521802, '100': 29.669774227803153, '150': 13.43565754774328, '200': 6.782817649892196, '250': 4.394840423928901, '300': 2.820753824420195}
+----------------------------------------------------------------------------------------------------
+COMPARISONS (validation, then the single test stage)
+[S8_cmmd_fp VAL] not run yet
+[S8_cmmd_fp TEST] not run yet
+[S8_cbis_fp VAL] not run yet
+[S8_cbis_fp TEST] not run yet
+[S8_cmmd_main VAL] not run yet
+[S8_cmmd_main TEST] not run yet
+[S8_cbis_long VAL] not run yet
+[S8_cbis_long TEST] not run yet

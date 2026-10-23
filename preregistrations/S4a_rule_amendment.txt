@@ -1,0 +1,16 @@
+S4a PRE-STATED RULE - AMENDMENT 1
+Recorded: 2026-10-21 01:12 (Asia/Dhaka), while the S4a run was in progress and BEFORE any screening result
+(KID, MSE, residual) of any arm had been seen. Only the smoke-test log (tiny settings) had been seen.
+
+Change: validation-error guards (validation MSE and validation training loss) <= 1.02x control  ->  <= 1.15x control.
+Unchanged: KID-mammo <= 0.90x control with the paired-bootstrap 95 % CI of the difference below 0; saturation
+<= max(1.25x control, control + 0.005); memorisation share <= 0.01; winner = largest KID reduction; test set unused.
+
+Reason (stated in advance): the score-norm penalty makes the model predict slightly less noise, which raises validation
+MSE by construction even when generated images improve (a small noise shrink at sampling time is known to improve FID:
+Epsilon Scaling, Ning et al., ICLR 2024). The guard exists to catch a broken denoiser (S3 FP arms: +17 % to +52 % MSE
+with worse KID); 1.15x still rejects those.
+
+Reporting: the S4a report states the outcome under BOTH the original (1.02x) and the amended (1.15x) rule.
+Follow-up added to the plan: a training-free Epsilon-Scaling baseline at sampling time, so a winning regulariser is
+compared against simply shrinking the predicted noise.

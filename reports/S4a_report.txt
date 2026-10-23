@@ -1,0 +1,89 @@
+==============================================================================================================
+S4a REPORT - gradient signal test + cheap FP-derived regulariser screening (validation only; TEST SET NOT USED)
+==============================================================================================================
+
+[B1] FOKKER-PLANCK RESIDUAL PROFILE of the epoch-40 baseline (32 validation probe images, 2 probes)
+     t   sigma   mean r1r2 (z)          RMS(u.d_tau s)   relative violation
+     1  0.0148  +4.914e+07 (  4.72)   1.983e+04        0.353
+     2  0.0190  +9.846e+06 (  2.17)   1.125e+04        0.279
+     5  0.0300  +9.082e+05 (  3.91)   3.650e+03        0.261
+    10  0.0468  +7.856e+04 (  3.39)   1.404e+03        0.200
+    20  0.0791  +1.066e+04 (  4.07)   5.261e+02        0.196
+    50  0.1733  +5.647e+02 (  4.67)   1.000e+02        0.238
+   100  0.3238  +6.854e+01 (  5.05)   2.478e+01        0.334
+   200  0.5862  +3.721e+00 (  3.84)   5.371e+00        0.359
+   300  0.7785  +1.612e+00 (  3.86)   2.913e+00        0.436
+   500  0.9603  +9.776e-01 (  3.72)   1.121e+00        0.882
+   700  0.9966  +2.179e-01 (  3.80)   3.918e-01        1.192
+   900  0.9999  +1.622e-02 (  0.19)   3.148e-01        0.405
+   990  1.0000  +3.287e-01 (  3.83)   3.321e-01        1.727
+
+[B2] EXACT-JVP CHECK OF THE FD STEP AT SMALL t (rule <= 0.10)
+  {'t': 1, 'p': 0.001, 'rel_err_fd_vs_jvp': 0.022954487649090614, 'pass': True}
+  {'t': 2, 'p': 0.001, 'rel_err_fd_vs_jvp': 0.008316555079860339, 'pass': True}
+  {'t': 5, 'p': 0.001, 'rel_err_fd_vs_jvp': 0.004329530264208367, 'pass': True}
+  {'t': 10, 'p': 0.001, 'rel_err_fd_vs_jvp': 0.004027818839175606, 'pass': True}
+
+[B3] GRADIENT SIGNAL-TO-NOISE (SNR of ONE sample; 'needed' = samples to average for SNR 1)
+  base loss, per micro-batch of 2: SNR 0.166 -> micro-batches needed 36.2 (one optimizer step averages 4)
+  FP t=  2: SNR 0.040 -> samples needed 619.7 (at the upper 95 % of |mean|: 62.9) | image-level/population |mean|^2 11.0 | cos(mean FP, mean base) 0.094 | mean pull vs base at lam .054: 0.381
+  FP t= 10: SNR 0.000 -> samples needed inf (at the upper 95 % of |mean|: 249.0) | image-level/population |mean|^2 nan | cos(mean FP, mean base) n/a | mean pull vs base at lam .054: 0.000
+  FP t= 50: SNR 0.120 -> samples needed 69.2 (at the upper 95 % of |mean|: 35.5) | image-level/population |mean|^2 0.8 | cos(mean FP, mean base) -0.072 | mean pull vs base at lam .054: 0.928
+  FP t=150: SNR 0.081 -> samples needed 152.5 (at the upper 95 % of |mean|: 57.7) | image-level/population |mean|^2 1.4 | cos(mean FP, mean base) 0.006 | mean pull vs base at lam .054: 0.675
+  FP t=300: SNR 0.056 -> samples needed 318.8 (at the upper 95 % of |mean|: 68.6) | image-level/population |mean|^2 7.1 | cos(mean FP, mean base) 0.415 | mean pull vs base at lam .054: 1.158
+
+[S1] SCREENING at epoch 44 vs control s3_m0 (paired)
+  control: KID-mammo (full reference) 0.6079 | subset KID [0.6130059211102484, 0.05046032808062364] | val MSE 0.00799 | saturation 0.0252 | H 0.0871
+  s4_r1a (sn, rho 0.25, lambda 0.03332): KID 0.7996 = x1.315 of control (diff CI +0.1617..+0.2228) | val MSE x1.0486 loss x1.0028 | saturation 0.0184 | memorisation 0.000 | FP residual R +0.048 (CI -0.017..+0.104)
+      HF energy b/m: 0.0038/0.0046 (control 0.0029/0.0035, real 0.0032/0.0028) | brightness b/m 0.417/0.410
+      checks {'KID<=0.90x': False, 'KID_CI<0': False, 'val_mse<=1.15': True, 'val_loss<=1.15': True, 'saturation': True, 'memorisation<=0.01': True} -> fail (amended rule) | original 1.02x rule: fail
+  s4_r1b (sn, rho 0.1, lambda 0.01335): KID 0.6997 = x1.151 of control (diff CI +0.0642..+0.1206) | val MSE x1.0063 loss x0.9840 | saturation 0.0283 | memorisation 0.000 | FP residual R +0.002 (CI -0.043..+0.048)
+      HF energy b/m: 0.0033/0.0037 (control 0.0029/0.0035, real 0.0032/0.0028) | brightness b/m 0.484/0.481
+      checks {'KID<=0.90x': False, 'KID_CI<0': False, 'val_mse<=1.15': True, 'val_loss<=1.15': True, 'saturation': True, 'memorisation<=0.01': True} -> fail (amended rule) | original 1.02x rule: fail
+  s4_r2a (sn, rho 0.25, lambda 0.20373): KID 0.8030 = x1.321 of control (diff CI +0.1641..+0.2249) | val MSE x1.2876 loss x1.0420 | saturation 0.0298 | memorisation 0.000 | FP residual R -0.014 (CI -0.168..+0.146)
+      HF energy b/m: 0.0032/0.0038 (control 0.0029/0.0035, real 0.0032/0.0028) | brightness b/m 0.480/0.486
+      checks {'KID<=0.90x': False, 'KID_CI<0': False, 'val_mse<=1.15': False, 'val_loss<=1.15': True, 'saturation': True, 'memorisation<=0.01': True} -> fail (amended rule) | original 1.02x rule: fail
+  s4_r2b (sn, rho 0.1, lambda 0.08202): KID 0.6323 = x1.040 of control (diff CI -0.0094..+0.0597) | val MSE x1.0193 loss x0.9902 | saturation 0.0200 | memorisation 0.000 | FP residual R -0.060 (CI -0.160..+0.043)
+      HF energy b/m: 0.0029/0.0031 (control 0.0029/0.0035, real 0.0032/0.0028) | brightness b/m 0.488/0.470
+      checks {'KID<=0.90x': False, 'KID_CI<0': False, 'val_mse<=1.15': True, 'val_loss<=1.15': True, 'saturation': True, 'memorisation<=0.01': True} -> fail (amended rule) | original 1.02x rule: fail
+  s4_r3 (div, rho 0.25, lambda 0.02741): KID 0.8283 = x1.363 of control (diff CI +0.1884..+0.2505) | val MSE x1.0247 loss x0.9938 | saturation 0.0162 | memorisation 0.000 | FP residual R +0.058 (CI -0.036..+0.132)
+      HF energy b/m: 0.0039/0.0047 (control 0.0029/0.0035, real 0.0032/0.0028) | brightness b/m 0.405/0.394
+      checks {'KID<=0.90x': False, 'KID_CI<0': False, 'val_mse<=1.15': True, 'val_loss<=1.15': True, 'saturation': True, 'memorisation<=0.01': True} -> fail (amended rule) | original 1.02x rule: fail
+
+[S2] DECISION (amended rule: validation-error guards <= 1.15x; under the original 1.02x rule the winner would be NONE)
+  NONE PASSED | closest: s4_r2b (KID x1.040)
+
+[S3] OPTIMISATION (training logs; norms before the clip at 1.0)
+  s3_m0 (none): 584 steps | median |g_base| 1.79 | clipped 0.80 | mean |update| 0.0236
+      epoch 41: loss 0.0317 mse 0.0064 | 14.7 min
+      epoch 42: loss 0.0322 mse 0.0062 | 14.1 min
+      epoch 43: loss 0.0319 mse 0.0066 | 13.1 min
+      epoch 44: loss 0.0315 mse 0.0058 | 12.3 min
+  s4_r1a (sn): 1168 steps | median |g_base| 1.76 | clipped 0.77 | mean |update| 0.0238 | |lam g_reg|/|g_base| median 0.171 p90 0.491 | capped 0.10 | cos(base, reg) -0.199 | penalty active in 1.00 of steps | regulariser predicted to decrease in 0.51 of steps
+      epoch 41: loss 0.0321 mse 0.0068 | 19.8 min
+      epoch 42: loss 0.0324 mse 0.0067 | 19.8 min
+      epoch 43: loss 0.0323 mse 0.0071 | 19.8 min
+      epoch 44: loss 0.0319 mse 0.0063 | 19.8 min
+  s4_r1b (sn): 1168 steps | median |g_base| 1.78 | clipped 0.77 | mean |update| 0.0236 | |lam g_reg|/|g_base| median 0.067 p90 0.194 | capped 0.10 | cos(base, reg) -0.082 | penalty active in 1.00 of steps | regulariser predicted to decrease in 0.50 of steps
+      epoch 41: loss 0.0317 mse 0.0064 | 19.8 min
+      epoch 42: loss 0.0323 mse 0.0063 | 19.8 min
+      epoch 43: loss 0.0319 mse 0.0067 | 19.8 min
+      epoch 44: loss 0.0314 mse 0.0059 | 19.7 min
+  s4_r2a (sn): 1168 steps | median |g_base| 1.79 | clipped 0.79 | mean |update| 0.0236 | |lam g_reg|/|g_base| median 0.289 p90 0.776 | capped 0.23 | cos(base, reg) -0.268 | penalty active in 0.34 of steps | regulariser predicted to decrease in 0.65 of steps
+      epoch 41: loss 0.0328 mse 0.0079 | 13.5 min
+      epoch 42: loss 0.0334 mse 0.0080 | 13.6 min
+      epoch 43: loss 0.0329 mse 0.0082 | 13.5 min
+      epoch 44: loss 0.0323 mse 0.0070 | 13.4 min
+  s4_r2b (sn): 1168 steps | median |g_base| 1.76 | clipped 0.77 | mean |update| 0.0242 | |lam g_reg|/|g_base| median 0.115 p90 0.349 | capped 0.24 | cos(base, reg) -0.114 | penalty active in 0.34 of steps | regulariser predicted to decrease in 0.61 of steps
+      epoch 41: loss 0.0319 mse 0.0067 | 13.4 min
+      epoch 42: loss 0.0326 mse 0.0066 | 13.5 min
+      epoch 43: loss 0.0320 mse 0.0069 | 13.5 min
+      epoch 44: loss 0.0315 mse 0.0060 | 13.4 min
+  s4_r3 (div): 1168 steps | median |g_base| 1.7 | clipped 0.75 | mean |update| 0.0244 | |lam g_reg|/|g_base| median 0.145 p90 0.415 | capped 0.07 | cos(base, reg) -0.156 | penalty active in 1.00 of steps | regulariser predicted to decrease in 0.57 of steps
+      epoch 41: loss 0.0321 mse 0.0067 | 27.0 min
+      epoch 42: loss 0.0324 mse 0.0065 | 27.0 min
+      epoch 43: loss 0.0325 mse 0.0072 | 27.1 min
+      epoch 44: loss 0.0319 mse 0.0062 | 27.0 min
+
+==============================================================================================================
+Send S4_report.txt (or S4_results.zip) and the grid_*.png images back.

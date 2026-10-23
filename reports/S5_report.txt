@@ -1,0 +1,53 @@
+==============================================================================================================
+S5 REPORT - physics-consistency scoring of synthetic mammograms + failure investigation (validation / train-fit only)
+==============================================================================================================
+
+[T1] RELIABILITY OF THE FP SCORE (rule: Spearman >= 0.5 between two independent scorings)
+  80 images: Spearman H 0.258 | per t 10:0.050 50:0.076 -> F1 UNRELIABLE
+
+[T2] FILTERS: keep the lowest-score 50 % per class (150+150 of 600); KID-mammo vs train-fit
+  whole pool 0.5038 | random 50 % subsets: median 0.5035, 2.5th pct 0.4845, 97.5th pct 0.5241
+  F1_fp                 : KID 0.4955 = x0.984 of random median | percentile among random  19.5 | kept saturation 0.0665 HF 0.0016 -> fail (F1 unreliable)
+  F2_noise_physics      : KID 0.5557 = x1.104 of random median | percentile among random 100.0 | kept saturation 0.0629 HF 0.0019 -> fail
+  F3_denoising_error    : KID 0.4559 = x0.905 of random median | percentile among random   0.0 | kept saturation 0.0679 HF 0.0014 -> fail
+  F4_trivial_intensity  : KID 0.4815 = x0.956 of random median | percentile among random   0.8 | kept saturation 0.0189 HF 0.0018 -> fail
+  F5_reference_knn      : KID 0.5127 = x1.018 of random median | percentile among random  82.4 | kept saturation 0.0759 HF 0.0015 -> REFERENCE ONLY
+  all pool: saturation 0.0705 HF 0.0016 | real validation: saturation 0.0131 HF 0.0030
+
+[T3] REAL vs GENERATED (AUC = P(generated scores worse than real); rule AUC >= 0.65 with CI lower > 0.5)
+  caveat: the real validation images were part of the diffusion model's training set (it was trained on all clean train
+  images), so a difference can also mean 'seen in training' - the filter test T2 does not have this problem
+  F1_fp                 : AUC 0.579 CI 0.542-0.615 | median generated 0.04067 vs real 0.03282 -> fail
+  F2_noise_physics      : AUC 0.525 CI 0.490-0.559 | median generated 0.9286 vs real 0.7921 -> fail
+  F3_denoising_error    : AUC 0.463 CI 0.426-0.498 | median generated 0.9224 vs real 0.9888 -> fail
+  F4_trivial_intensity  : AUC 0.821 CI 0.795-0.845 | median generated 3.615 vs real 1.655 -> PASS
+
+[E2] FP CONSISTENCY PER t (generated vs real)
+  t=  10: mean P generated 0.0958 vs real 0.0409 | AUC 0.552 CI 0.515-0.589
+  t=  50: mean P generated 0.0588 vs real 0.0459 | AUC 0.537 CI 0.497-0.574
+
+[CORR] Spearman correlation between the scores on the generated pool
+            F1_fp   F2_noi   F3_den   F4_tri   F5_ref
+  F1_fp     +1.00    -0.12    +0.31    +0.01    +0.03
+  F2_noi    -0.12    +1.00    -0.64    +0.20    -0.04
+  F3_den    +0.31    -0.64    +1.00    -0.01    +0.13
+  F4_tri    +0.01    +0.20    -0.01    +1.00    -0.11
+  F5_ref    +0.03    -0.04    +0.13    -0.11    +1.00
+
+[E3] CHECKPOINT SELECTION / WEIGHT AVERAGING (KID-mammo, 200 images, same noise; bootstrap 95 % CI; descriptive)
+  e3_avg      : KID 0.4505 (CI 0.4190-0.4847)
+  e3_ep035    : KID 0.7603 (CI 0.7198-0.8018)
+  e3_ep040    : KID 0.4932 (CI 0.4612-0.5272)
+  e3_ep041    : KID 0.4717 (CI 0.4401-0.5037)
+  e3_ep042    : KID 0.5093 (CI 0.4760-0.5432)
+  e3_ep044    : KID 0.6079 (CI 0.5660-0.6505)
+  single checkpoints: KID range 0.4717-0.7603 | between-checkpoint SD 0.1192 vs sampling (bootstrap) SD 0.0187 -> ratio 6.38
+  weight average vs the median single checkpoint (e3_ep042): diff CI -0.0882..-0.0276
+
+[E4] EPSILON SCALING at sampling (epoch 40) vs s = 1 (rule: KID <= 0.90x with paired CI < 0)
+  e4_s1.005   : KID 0.7130 = x1.446 (diff CI +0.1907..+0.2471) -> no
+  e4_s1.01    : KID 1.0438 = x2.116 (diff CI +0.5099..+0.5899) -> no
+  e4_s1.02    : KID 1.3969 = x2.833 (diff CI +0.8596..+0.9443) -> no
+
+==============================================================================================================
+Send S5_report.txt (or S5_results.zip) and the grid_*.png images back.

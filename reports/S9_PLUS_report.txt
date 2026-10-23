@@ -1,0 +1,103 @@
+================================================================================================================
+S9+ EXPLORATORY DIAGNOSTICS (CPU only; nothing here changes any pre-registered result)
+================================================================================================================
+B. CMMD RESOLUTION SWEEP of the noise-level function: original DICOM -> 1/2 -> 1/4 -> 256 x 256 (the DDPM input).
+   Question: is the signal-dependent (quantum) noise visible at full resolution and lost by the downsampling?
+  150 CMMD training DICOMs (random order, seed 1)
+  ~6 min expected for the sweep
+  original sizes: median 2294 x 1914 px | 5.2 min
+  CMMD original                  n  150 | linear: var = -6.56e-05 +2.77e-03*I (R2 0.80) | quadratic R2 0.95 | variance peak at I = 0.66 | rises in 73 % of bin steps
+  CMMD half                      n  150 | linear: var = 1.13e-05 +9.85e-04*I (R2 0.79) | quadratic R2 0.97 | variance peak at I = 0.60 | rises in 67 % of bin steps
+  CMMD quarter                   n  150 | linear: var = 4.76e-05 +8.59e-04*I (R2 0.81) | quadratic R2 0.98 | variance peak at I = 0.66 | rises in 73 % of bin steps
+  CMMD 256 px (DDPM)             n  150 | linear: var = 1.61e-04 +1.37e-03*I (R2 0.76) | quadratic R2 0.97 | variance peak at I = 0.60 | rises in 67 % of bin steps
+================================================================================================================
+loaded CBIS: real train-fit 1989 images | generated sets ['b40', 'b60', 'b90', 'bm0', 'bfp', 'sm0', 'snlf']
+loaded CMMD: real train-fit 1499 images | generated sets ['c40', 'cm0', 'cfp', 'cavg', 'c40_nl']
+================================================================================================================
+C. MEASURED NOISE-LEVEL FUNCTIONS at 256 px (same estimator as the physics term; 95 % bootstrap CI over images)
+  CBIS real                      n  400 | linear: var = 1.20e-03 -1.14e-03*I (R2 0.48) | quadratic R2 0.75 | variance peak at I = 0.20 | rises in 67 % of bin steps
+  CBIS b40                       n  200 | linear: var = 8.71e-04 -4.95e-04*I (R2 0.85) | quadratic R2 0.90 | variance peak at I = 0.25 | rises in 20 % of bin steps
+  CBIS b60                       n  200 | linear: var = 1.07e-03 -6.84e-04*I (R2 0.92) | quadratic R2 0.92 | variance peak at I = 0.20 | rises in 33 % of bin steps
+  CBIS b90                       n  200 | linear: var = 9.41e-04 -8.14e-04*I (R2 0.91) | quadratic R2 0.91 | variance peak at I = 0.20 | rises in 13 % of bin steps
+  CBIS bm0                       n  200 | linear: var = 1.06e-03 -7.06e-04*I (R2 0.55) | quadratic R2 0.91 | variance peak at I = 0.31 | rises in 27 % of bin steps
+  CBIS bfp                       n  200 | linear: var = 9.98e-04 -6.68e-04*I (R2 0.64) | quadratic R2 0.85 | variance peak at I = 0.25 | rises in 20 % of bin steps
+  CBIS sm0                       n  200 | linear: var = 1.20e-03 -5.82e-04*I (R2 0.45) | quadratic R2 0.95 | variance peak at I = 0.31 | rises in 40 % of bin steps
+  CBIS snlf                      n  200 | linear: var = 1.41e-03 -6.50e-04*I (R2 0.54) | quadratic R2 0.88 | variance peak at I = 0.20 | rises in 20 % of bin steps
+  CMMD real                      n  400 | linear: var = 1.37e-04 +1.54e-03*I (R2 0.88) | quadratic R2 0.98 | variance peak at I = 0.83 | rises in 80 % of bin steps
+  CMMD c40                       n  200 | linear: var = 2.87e-04 +3.61e-04*I (R2 0.20) | quadratic R2 0.97 | variance peak at I = 0.49 | rises in 47 % of bin steps
+  CMMD cm0                       n  200 | linear: var = 3.30e-04 +1.05e-03*I (R2 0.46) | quadratic R2 0.98 | variance peak at I = 0.54 | rises in 53 % of bin steps
+  CMMD cfp                       n  200 | linear: var = 4.17e-04 +6.89e-04*I (R2 0.28) | quadratic R2 0.98 | variance peak at I = 0.49 | rises in 47 % of bin steps
+  CMMD cavg                      n  200 | linear: var = 3.38e-04 +2.63e-04*I (R2 0.13) | quadratic R2 0.97 | variance peak at I = 0.49 | rises in 47 % of bin steps
+  CMMD c40_nl                    n  200 | linear: var = 5.25e-04 +1.47e-03*I (R2 0.69) | quadratic R2 0.98 | variance peak at I = 0.66 | rises in 67 % of bin steps
+================================================================================================================
+D. RADIAL POWER SPECTRUM (per-image min-max, mean removed, Hann window; frequency in cycles / pixel at 256 px)
+  CBIS real        : power share low 0.9995 | mid 0.00047 | high 1.80e-05 | log-log slope -3.24
+  CBIS b40       : power share low 0.9997 | mid 0.00030 | high 1.72e-05 | slope -2.95 | high-band power vs real x2.05
+  CBIS b60       : power share low 0.9996 | mid 0.00036 | high 2.46e-05 | slope -2.82 | high-band power vs real x2.37
+  CBIS b90       : power share low 0.9997 | mid 0.00028 | high 1.05e-05 | slope -3.21 | high-band power vs real x1.10
+  CBIS bm0       : power share low 0.9995 | mid 0.00045 | high 1.34e-05 | slope -3.40 | high-band power vs real x1.03
+  CBIS bfp       : power share low 0.9996 | mid 0.00040 | high 1.49e-05 | slope -3.25 | high-band power vs real x1.09
+  CBIS sm0       : power share low 0.9996 | mid 0.00037 | high 2.41e-05 | slope -2.87 | high-band power vs real x2.21
+  CBIS snlf      : power share low 0.9995 | mid 0.00045 | high 4.32e-05 | slope -2.61 | high-band power vs real x3.45
+  CMMD real        : power share low 0.9958 | mid 0.00401 | high 1.36e-04 | log-log slope -3.18
+  CMMD c40       : power share low 0.9976 | mid 0.00231 | high 3.97e-05 | slope -3.72 | high-band power vs real x0.38
+  CMMD cm0       : power share low 0.9958 | mid 0.00414 | high 9.67e-05 | slope -3.48 | high-band power vs real x0.79
+  CMMD cfp       : power share low 0.9962 | mid 0.00375 | high 7.94e-05 | slope -3.61 | high-band power vs real x0.63
+  CMMD cavg      : power share low 0.9978 | mid 0.00211 | high 5.47e-05 | slope -3.38 | high-band power vs real x0.70
+  CMMD c40_nl    : power share low 0.9975 | mid 0.00238 | high 1.12e-04 | slope -2.96 | high-band power vs real x1.05
+================================================================================================================
+E. INTENSITY DISTRIBUTION of breast pixels (per-image min-max; breast = 7x7 local mean > 0.04; 2000 pixels / image)
+  CBIS real      : p1 0.000 p50 0.451 p99 0.988 | mean 0.440 sd 0.222 | saturated (> 0.95) 1.45 %
+  CBIS b40       : p1 0.012 p50 0.616 p99 0.996 | mean 0.568 sd 0.290 | saturated (> 0.95) 6.71 %
+  CBIS b60       : p1 0.000 p50 0.471 p99 0.965 | mean 0.455 sd 0.257 | saturated (> 0.95) 1.33 %
+  CBIS b90       : p1 0.004 p50 0.578 p99 0.980 | mean 0.538 sd 0.262 | saturated (> 0.95) 2.63 %
+  CBIS bm0       : p1 0.008 p50 0.541 p99 0.984 | mean 0.516 sd 0.292 | saturated (> 0.95) 3.70 %
+  CBIS bfp       : p1 0.008 p50 0.541 p99 1.000 | mean 0.519 sd 0.295 | saturated (> 0.95) 6.03 %
+  CBIS sm0       : p1 0.000 p50 0.494 p99 1.000 | mean 0.488 sd 0.294 | saturated (> 0.95) 5.15 %
+  CBIS snlf      : p1 0.000 p50 0.478 p99 0.992 | mean 0.475 sd 0.274 | saturated (> 0.95) 3.26 %
+  CMMD real      : p1 0.000 p50 0.253 p99 0.827 | mean 0.293 sd 0.191 | saturated (> 0.95) 0.19 %
+  CMMD c40       : p1 0.004 p50 0.275 p99 1.000 | mean 0.352 sd 0.281 | saturated (> 0.95) 3.06 %
+  CMMD cm0       : p1 0.004 p50 0.247 p99 0.976 | mean 0.316 sd 0.247 | saturated (> 0.95) 1.44 %
+  CMMD cfp       : p1 0.008 p50 0.251 p99 0.988 | mean 0.323 sd 0.257 | saturated (> 0.95) 1.98 %
+  CMMD cavg      : p1 0.000 p50 0.294 p99 0.988 | mean 0.357 sd 0.269 | saturated (> 0.95) 1.96 %
+  CMMD c40_nl    : p1 0.000 p50 0.271 p99 1.000 | mean 0.350 sd 0.281 | saturated (> 0.95) 2.99 %
+================================================================================================================
+F. KID SAMPLE-SIZE STABILITY (paired subsamples of n generated images vs the full reference; 200 repeats)
+  S8_cbis_long_val mammo b40 vs b60: n 25: b40 0.492+-0.050 b60 0.397+-0.040 order kept 97 % | n 50: b40 0.489+-0.029 b60 0.400+-0.025 order kept 100 % | n 100: b40 0.492+-0.016 b60 0.402+-0.015 order kept 100 % | n 150: b40 0.493+-0.010 b60 0.400+-0.009 order kept 100 % | n 200: b40 0.493+-0.000 b60 0.401+-0.000 order kept 100 %
+  S8_cbis_long_val mammo b40 vs b90: n 25: b40 0.492+-0.050 b90 0.444+-0.048 order kept 83 % | n 50: b40 0.489+-0.029 b90 0.444+-0.031 order kept 88 % | n 100: b40 0.492+-0.016 b90 0.447+-0.017 order kept 100 % | n 150: b40 0.493+-0.010 b90 0.447+-0.011 order kept 100 % | n 200: b40 0.493+-0.000 b90 0.447+-0.000 order kept 100 %
+  S8_cbis_long_val dino  b40 vs b60: n 25: b40 24.380+-1.745 b60 19.520+-1.331 order kept 100 % | n 50: b40 24.120+-1.204 b60 19.564+-0.895 order kept 100 % | n 100: b40 24.272+-0.686 b60 19.654+-0.554 order kept 100 % | n 150: b40 24.281+-0.401 b60 19.670+-0.313 order kept 100 % | n 200: b40 24.263+-0.000 b60 19.647+-0.000 order kept 100 %
+  S8_cbis_long_val dino  b40 vs b90: n 25: b40 24.380+-1.745 b90 17.372+-0.985 order kept 100 % | n 50: b40 24.120+-1.204 b90 17.329+-0.774 order kept 100 % | n 100: b40 24.272+-0.686 b90 17.360+-0.410 order kept 100 % | n 150: b40 24.281+-0.401 b90 17.290+-0.252 order kept 100 % | n 200: b40 24.263+-0.000 b90 17.312+-0.000 order kept 100 %
+  S8_cmmd_main_val mammo c40 vs cavg: n 25: c40 0.280+-0.034 cavg 0.282+-0.051 order kept 46 % | n 50: c40 0.282+-0.020 cavg 0.283+-0.027 order kept 48 % | n 100: c40 0.281+-0.012 cavg 0.281+-0.018 order kept 50 % | n 150: c40 0.281+-0.007 cavg 0.282+-0.009 order kept 48 % | n 200: c40 0.282+-0.000 cavg 0.281+-0.000 order kept 100 %
+  S8_cmmd_main_val mammo c40 vs c40_nl: n 25: c40 0.280+-0.034 c40_nl 0.318+-0.037 order kept 94 % | n 50: c40 0.282+-0.020 c40_nl 0.320+-0.020 order kept 100 % | n 100: c40 0.281+-0.012 c40_nl 0.318+-0.012 order kept 100 % | n 150: c40 0.281+-0.007 c40_nl 0.319+-0.008 order kept 100 % | n 200: c40 0.282+-0.000 c40_nl 0.319+-0.000 order kept 100 %
+  S8_cmmd_main_val dino  c40 vs cavg: n 25: c40 26.076+-0.999 cavg 25.924+-1.008 order kept 56 % | n 50: c40 25.988+-0.641 cavg 25.893+-0.580 order kept 56 % | n 100: c40 26.025+-0.348 cavg 25.909+-0.353 order kept 61 % | n 150: c40 26.026+-0.217 cavg 25.890+-0.202 order kept 72 % | n 200: c40 26.005+-0.000 cavg 25.886+-0.000 order kept 100 %
+  S8_cmmd_main_val dino  c40 vs c40_nl: n 25: c40 26.076+-0.999 c40_nl 29.776+-1.083 order kept 100 % | n 50: c40 25.988+-0.641 c40_nl 29.746+-0.729 order kept 100 % | n 100: c40 26.025+-0.348 c40_nl 29.751+-0.405 order kept 100 % | n 150: c40 26.026+-0.217 c40_nl 29.758+-0.237 order kept 100 % | n 200: c40 26.005+-0.000 c40_nl 29.742+-0.000 order kept 100 %
+  S8_cmmd_fp_val mammo cm0 vs cfp: n 25: cm0 0.329+-0.043 cfp 0.598+-0.085 order kept 100 % | n 50: cm0 0.334+-0.029 cfp 0.604+-0.055 order kept 100 % | n 100: cm0 0.332+-0.016 cfp 0.606+-0.036 order kept 100 % | n 150: cm0 0.334+-0.009 cfp 0.608+-0.020 order kept 100 % | n 200: cm0 0.334+-0.000 cfp 0.607+-0.000 order kept 100 %
+  S8_cmmd_fp_val dino  cm0 vs cfp: n 25: cm0 29.098+-1.144 cfp 39.965+-1.412 order kept 100 % | n 50: cm0 29.162+-0.769 cfp 40.112+-0.895 order kept 100 % | n 100: cm0 29.179+-0.442 cfp 40.080+-0.552 order kept 100 % | n 150: cm0 29.237+-0.242 cfp 40.162+-0.318 order kept 100 % | n 200: cm0 29.217+-0.000 cfp 40.122+-0.000 order kept 100 %
+================================================================================================================
+G. MODEL TABLE (validation features saved by S8; exploratory, no checkpoint is selected here)
+  S8_cbis_long_val  b40    : KID-mammo 0.4932 | KID-DINOv2 24.263 | KID-Inception 0.0664 | saturated 6.72 % | HF 0.00171 | high-band power vs real x2.05
+  S8_cbis_long_val  b60    : KID-mammo 0.4008 | KID-DINOv2 19.647 | KID-Inception 0.0478 | saturated 1.33 % | HF 0.00241 | high-band power vs real x2.37
+  S8_cbis_long_val  b90    : KID-mammo 0.4471 | KID-DINOv2 17.312 | KID-Inception 0.0528 | saturated 2.63 % | HF 0.00184 | high-band power vs real x1.10
+  S8_cbis_fp_val    bm0    : KID-mammo 0.4084 | KID-DINOv2 16.943 | KID-Inception 0.0740 | saturated 3.71 % | HF 0.00295 | high-band power vs real x1.03
+  S8_cbis_fp_val    bfp    : KID-mammo 0.6690 | KID-DINOv2 37.490 | KID-Inception 0.1336 | saturated 6.04 % | HF 0.00266 | high-band power vs real x1.09
+  S8_cbis_sep_val   sm0    : KID-mammo 0.5346 | KID-DINOv2 27.662 | KID-Inception 0.0840 | saturated 5.15 % | HF 0.00290 | high-band power vs real x2.21
+  S8_cbis_sep_val   snlf   : KID-mammo 0.6023 | KID-DINOv2 28.740 | KID-Inception 0.0965 | saturated 3.26 % | HF 0.00319 | high-band power vs real x3.45
+  S8_cmmd_main_val  c40    : KID-mammo 0.2817 | KID-DINOv2 26.005 | KID-Inception 0.0745 | saturated 3.06 % | HF 0.00374 | high-band power vs real x0.38
+  S8_cmmd_main_val  cavg   : KID-mammo 0.2814 | KID-DINOv2 25.886 | KID-Inception 0.0625 | saturated 1.96 % | HF 0.00300 | high-band power vs real x0.70
+  S8_cmmd_main_val  c40_nl : KID-mammo 0.3192 | KID-DINOv2 29.742 | KID-Inception 0.0899 | saturated 2.99 % | HF 0.00442 | high-band power vs real x1.05
+  S8_cmmd_fp_val    cm0    : KID-mammo 0.3335 | KID-DINOv2 29.217 | KID-Inception 0.0821 | saturated 1.44 % | HF 0.00346 | high-band power vs real x0.79
+  S8_cmmd_fp_val    cfp    : KID-mammo 0.6073 | KID-DINOv2 40.122 | KID-Inception 0.1143 | saturated 1.98 % | HF 0.00341 | high-band power vs real x0.63
+================================================================================================================
+I. FP GRADIENT CONDITIONING (S8 training logs): |lambda g_FP| / |g_base|, cosine(g_base, g_FP), clipping, by timestep
+  cl_l016   : 584 optimizer steps | clipped 87 % | median |g_base| 1.87 | median ratio 0.26 | mean cos +0.000 (positive in 51 %)
+              t 10-49: ratio 0.16, cos -0.002 (n 76)
+              t 50-99: ratio 0.21, cos +0.001 (n 104)
+              t 100-199: ratio 0.26, cos +0.000 (n 198)
+              t 200-300: ratio 0.36, cos +0.001 (n 206)
+  cl_m0     : 584 optimizer steps | clipped 80 % | median |g_base| 2.00
+  cmmd_l016 : 444 optimizer steps | clipped 67 % | median |g_base| 1.00 | median ratio 0.50 | mean cos +0.005 (positive in 52 %)
+              t 10-49: ratio 0.31, cos +0.007 (n 62)
+              t 50-99: ratio 0.42, cos +0.007 (n 78)
+              t 100-199: ratio 0.35, cos +0.002 (n 158)
+              t 200-300: ratio 0.79, cos +0.005 (n 146)
+  cmmd_m0   : 888 optimizer steps | clipped 54 % | median |g_base| 1.07

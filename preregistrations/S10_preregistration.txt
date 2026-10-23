@@ -1,0 +1,45 @@
+S10 PRE-REGISTRATION - does physics help BEYOND an improved baseline?
+Written 2026-10-22 ~19:00 Asia/Dhaka, BEFORE any S10 code was run and before any S9 result exists.
+Design is based only on S3-S8 results (S8_FINAL_DECISION_SUMMARY.txt). S10 is a NEW study, decided after S8;
+the S8 sentence "S8 ends the experimental part" is hereby amended and this amendment is disclosed in the paper.
+==================================================================================================================
+
+WHY: in S8 the only thing that improved the baseline was longer training (CBIS epoch 60: KID-mammo x0.81), the
+training recipe has no EMA, and checkpoint-to-checkpoint KID varies ~12 %. Every physics term tested so far was
+added to this weak baseline. S10 first improves the baseline (EMA), uses 2 training seeds, and then asks whether the
+physics term adds anything on top.
+
+DATA: CMMD cohort D1, identical caches to S8 (cmmd_data/, train 1775 / test 438, patient split seed 0).
+  Reason for CMMD only: the noise-level function is far closer to the assumed physics model on CMMD (digital FFDM)
+  than on CBIS-DDSM (film), so this is the setting most favourable to the physics term.
+
+MODELS (all trained FROM SCRATCH with the Experiment-2 recipe = train_arm2.py, 50 epochs, plus EMA):
+  E0_s42, E0_s43 : lambda 0     (baseline)                         seeds 42 and 43 (init + data order)
+  E1_s42, E1_s43 : lambda 0.01  (physics: the September Poisson-Gaussian noise-level-function hinge on the predicted
+                   clean image x0_hat, weighted by alpha_bar(t), tau = 0.9 quantile of real CMMD residuals; the NLF is
+                   fitted on the CMMD training images - i.e. the physics term that matched the data best)
+  EMA of the weights in fp32: decay_n = min(0.999, (1 + n) / (10 + n)) per optimizer step n, applied every 2 optimizer
+  steps as decay_n**2 (kept on the CPU so that the model still fits in T4 memory; fixed before any run).
+  Each run saves RAW and EMA weights at epoch 50 (final). E0_s42 also at epoch 25 (descriptive curve only).
+  Checkpoint rule (fixed now): the FINAL epoch (50). No checkpoint selection of any kind.
+
+COMPARISONS (confirmatory; each pools both seeds: 2 x 100 images / class at validation, 2 x 150 / class at test)
+  K1  EMA effect:                     E0-EMA  vs  E0-raw
+  K2  PRIMARY - physics beyond EMA:   E1-EMA  vs  E0-EMA
+  K3  physics without EMA:            E1-raw  vs  E0-raw
+  D2  descriptive only: E0_s42 epoch 25 vs 50, raw and EMA (validation only).
+
+RULE (same metrics as S6-S8): PASS if, on the pooled images,
+  KID-mammo <= 0.90 x the reference arm with paired-bootstrap CI of the difference < 0,
+  KID-DINOv2 <= 1.00 x, recall >= reference - 0.05,
+  AND the KID-mammo ratio is < 1.00 in EACH seed separately (same direction in both independent trainings).
+  KID-mammo feature space = cmmd_clf_s0.pt (S8). Inception FID/KID reported descriptively.
+  Sampler: DDIM-50, guidance 2; validation noise seed 2025, test noise seed 9025 (same noise bank for every arm, so
+  image i is paired across arms).
+  Validation reference = CMMD train-fit images; test reference = CMMD test images, ONE test stage for K1-K3 at
+  98.33 % CI (Bonferroni over 3). Disclosure: the CMMD test images were used once before (S8, KID only).
+
+PREDICTIONS (written now): K1 pass is plausible (EMA is standard practice); K2 and K3 fail (physics again does not
+  help). If K2 fails, the paper reports that the physics term did not help even on an improved, 2-seed baseline.
+
+NO CHANGES after results: no new lambda, epochs, seeds, arms or metrics; no retry of failed comparisons.

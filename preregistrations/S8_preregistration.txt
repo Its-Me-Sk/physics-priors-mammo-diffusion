@@ -1,0 +1,62 @@
+S8 PRE-REGISTRATION - replication on a second dataset (CMMD) + longer CBIS-DDSM training
+Written 2026-10-21 ~22:40 Asia/Dhaka, BEFORE any CMMD model was trained and before any S7 result was seen.
+Only the CMMD folder structure was inspected (S8 data check: file lists and label tables, no images analysed).
+==========================================================================================================
+
+WHY: the S3-S6 results come from one dataset (CBIS-DDSM, scanned film) and one model trained for 40 epochs.
+S8 asks whether the main findings hold on (a) a second, DIGITAL mammography dataset and (b) a longer-trained model.
+
+DATA - CMMD (The Chinese Mammography Database, TCIA, DOI 10.7937/tcia.eqde-4b16; Kaggle copy tommyngx/cmmd2022)
+  * cohort D1 ONLY (patients D1-xxxx). Reason (fixed now): cohort D2 is malignant-only, so using it would let
+    the class label be predicted from the cohort / acquisition period instead of from the breast.
+  * label = "classification" (Benign 0 / Malignant 1) of CMMD_clinicaldata_revision.xlsx, joined per
+    (patient ID, breast side) with the DICOM ImageLaterality tag. Images without a unique label: excluded.
+  * preprocessing identical to CBIS-DDSM: 8-bit grey (MONOCHROME1 inverted), PIL resize to 256 x 256.
+  * patient-level split, seed 0: 80 % train / 20 % test, stratified by patient label. The validation part
+    of train (val_mask, 15 % of train patients, seed 0) is the KID reference, exactly as for CBIS-DDSM.
+  * no class rebalancing (D1 is close to balanced).
+
+MODELS (same code and recipe as before: train_arm2.py = Experiment-2 recipe, train_fp.py = S3 recipe)
+  * CMMD baseline: from scratch, seed 42, 40 epochs.
+  * CMMD control  cmmd_m0  : lambda 0,     epochs 40 -> 44 (snapshots 41, 42, 44).
+  * CMMD FP arm   cmmd_l016: lambda 0.016, epochs 40 -> 42 (the mildest S3 setting).
+    S_ref(t) recomputed for the CMMD epoch-40 model exactly as in S2 (A8, section 2).
+  * CBIS long run: the clean baseline (seed 42) continued from epoch 40 to epoch 90 (same recipe).
+  * CBIS-long control cl_m0 (lambda 0) and FP arm cl_l016 (lambda 0.016): epochs 90 -> 92,
+    S_ref recomputed for the epoch-90 model.
+
+COMPARISONS (fixed now; no other comparison will be used for a claim)
+  C1  CMMD FP:              cmmd_l016 ep42  vs  cmmd_m0 ep42
+  C2  CBIS-long FP:         cl_l016 ep92    vs  cl_m0 ep92
+  C3  CMMD weight averaging: average(ep40, m0 ep41, m0 ep42, m0 ep44)  vs  ep40   (S6 definition of "avgA")
+  C4  CMMD acquisition layer: ep40 + Poisson-Gaussian noise (S7 definition, NLF fitted on CMMD train-fit)  vs  ep40
+  D1  descriptive only: CBIS ep40 vs ep60 vs ep90 (does longer training change sample quality?)
+
+RULE (identical to S6/S7): PASS if KID-mammo <= 0.90 x reference arm with paired-bootstrap CI of the difference < 0,
+  KID-DINOv2 <= 1.00 x, recall >= reference - 0.05.
+  KID-mammo feature space: CBIS-DDSM = the S2 classifier (a6_clf_s0.pt); CMMD = the same classifier recipe trained on
+  CMMD train-fit, seed 0 (cmmd_clf_s0.pt). Inception-v3 FID and KID are reported for every set (descriptive).
+  Sampler: DDIM-50, guidance 2, 100 images / class (validation, noise seed 2025), 150 / class (test, seed 9025).
+
+TEST STAGE (all four comparisons C1-C4, run once, fixed in advance -> no selection on validation results):
+  reference = the held-out TEST images of the same dataset; CI level 98.75 % (Bonferroni over the 4 comparisons).
+  Disclosure: the CBIS-DDSM test set was used before (S6 downstream AUCs; S7 only if S7 passed validation).
+  The CMMD test set has never been used.
+
+PREDICTIONS written now (so the reader can check them):
+  C1, C2: FP does NOT pass (replication of S3/S4). C3: small gain, may or may not pass. C4: uncertain.
+  A negative C1/C2 on a second dataset and a stronger model is a REPLICATION, and will be reported as such.
+
+NO CHANGES after results: no new lambda, no new arms, no new datasets, no retries of failed comparisons.
+S8 ends the experimental part of the project.
+
+ADDENDUM 1 (written 2026-10-21 23:10 Asia/Dhaka, BEFORE S8 was started; no S8 or S7 result exists)
+--------------------------------------------------------------------------------------------------
+C5 added - clean re-test of the September physics loss (the Poisson-Gaussian noise-level-function hinge of
+train_arm2.py, Experiment 2 "pinn2": lambda 0.01, tau = 0.9 quantile of real residuals), which so far exists only
+on the original (leaky) split:
+  C5  CBIS clean:  sep_nlf (lambda 0.01) ep42  vs  sep_m0 (lambda 0) ep42
+      both arms start from the clean epoch-40 baseline (weights + Adam state) and train 2 epochs with the same
+      recipe and data order (train_arm2.py); the only difference is lambda.
+Same rule as C1-C4, validation then the single test stage. The test-stage CI becomes 99 % for ALL comparisons
+(Bonferroni over 5 comparisons, alpha 0.01). Prediction: C5 does not pass.

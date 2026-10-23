@@ -1,0 +1,45 @@
+S11 PRE-REGISTRATION - physics-based dose augmentation for a benign/malignant classifier (no generative model)
+Written 2026-10-22 ~19:00 Asia/Dhaka, BEFORE any S11 code was run.
+==================================================================================================================
+
+IDEA: use the X-ray noise physics where it is known to be useful - simulating lower-dose acquisitions (Poisson
+quantum noise; Borges et al.; Eckert et al. used it for denoising) - as data augmentation for a diagnostic classifier,
+and test whether the PHYSICAL shape of the noise matters compared with generic noise of the same power.
+
+DATA: CMMD D1 (S8 caches; train-fit 1499 / validation 276 / test 438) and clean CBIS-DDSM (train-fit 1989 / test 663).
+
+CLASSIFIER: the fixed S2 recipe (ConvNeXt-Tiny ImageNet, AdamW 1e-4, wd 0.05, batch 32, 15 epochs, cosine, flip +
+small affine, class-balanced cross-entropy, FINAL epoch). Seeds 0, 1, 2, 3, 4. No tuning, no early stopping.
+
+ARMS (augmentation applied to the [0,1]-scaled image after the standard flip/affine, probability 0.8 per image):
+  R0  standard augmentation only.
+  R1  + generic noise: white Gaussian noise, intensity-INDEPENDENT, variance = the mean added variance of R2 over the
+      training set (matched power, different shape).
+  R2  + physics dose reduction: dose fraction alpha ~ Uniform(0.25, 1); added noise variance per pixel
+      = [ a*I*(1/alpha - 1) + b*(1/alpha^2 - 1) ] / k,  clamped at 0,
+      where (a, b) = linear Poisson-Gaussian noise-level fit (PhysicsNLF, same code as S7/S8) on that dataset's
+      train-fit images, I = per-image min-max intensity, and k = the fixed high-pass-filter variance factor of
+      PhysicsNLF (converts measured high-pass variance to white-noise variance; computed from the filter, not tuned).
+  On CBIS-DDSM the fitted model is unphysical (a < 0, S7); it is used as fitted anyway (prediction: no benefit there).
+
+TEST CONDITIONS (test images, each used once, after all training is finished):
+  T-clean  : unmodified test images.
+  T-dose50 / T-dose25 : CMMD test images degraded with the R2 physics model at alpha = 0.5 / 0.25 (fixed seed 4242).
+  Cross    : CMMD-trained models on the CBIS test set; CBIS-trained models on the CMMD test set (clean).
+
+ENDPOINTS (statistic = AUC of the 5-seed ensemble = mean predicted probability; paired stratified bootstrap over test
+images, 2000 resamples; primary CIs at 98.33 % = Bonferroni over 3)
+  P1  CMMD-trained, T-dose25:  AUC(R2) - AUC(R0) > 0   (CI lower bound > 0)
+  P2  CMMD-trained, T-dose25:  AUC(R2) - AUC(R1) > 0   (physics shape matters beyond generic noise)
+  P3  CMMD-trained, T-clean :  AUC(R2) - AUC(R0) >= -0.02  (non-inferiority: CI lower bound > -0.02)
+  Secondary (95 % CI, descriptive): T-dose50 versions of P1/P2; cross-dataset R2 vs R0 and R1 vs R0 in both
+  directions; CBIS-trained R2 vs R0 on CBIS test. Also reported: mean +- SD of single-seed AUCs, and in how many of
+  the 5 seeds the difference has the same sign.
+
+LIMITATION stated in advance: T-dose uses the same noise model as R2 training, so P1 measures robustness to the
+modelled dose reduction, not to real low-dose acquisitions (none are available). P2 is the key scientific test.
+The CMMD and CBIS test images were used before for KID of generated images (S6-S8, S10); they were never used to
+train or select a classifier in this study.
+
+PREDICTIONS: P1 pass likely; P2 uncertain; P3 pass likely; no benefit on CBIS-trained models.
+NO CHANGES after results.

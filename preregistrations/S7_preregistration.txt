@@ -1,0 +1,49 @@
+S7 PRE-REGISTRATION  (written 2026-10-21 18:50 Asia/Dhaka, BEFORE any S6 result was seen)
+=====================================================================================
+
+Idea: "physics-based acquisition layer" - no training.
+  The diffusion model generates a clean image. A real mammogram is that image PLUS the noise of the
+  acquisition chain. S5 measured that generated images have about half the real high-frequency energy
+  (0.0016 vs 0.0030). S7 adds back acquisition noise from a physical noise model fitted ONLY on train-fit
+  images. No generated image is used to fit anything.
+
+Noise model (fixed now):
+  Poisson-Gaussian noise-level function: sigma(I)^2 = a*I + b   (I = pixel intensity in [0,1])
+  a, b fitted on the train-fit real images with pinn_physics.PhysicsNLF (the same code as S5 F2).
+  Output: x_out = clip(x + sigma(x)*z, 0, 1), with z ~ N(0,1) and a fixed seed per image slot.
+  No other parameter. No tuning of a, b after seeing any S7 result.
+
+Arms (fixed now):
+  S6 decides the input set G:
+    - if S6 test CONFIRMED a winner  -> G = that winner
+    - otherwise                      -> G = v_base (epoch-40 baseline)
+  S7 compares G + noise layer  vs  G   (same images, paired).
+
+Rule (the same as S6, fixed now):
+  PASS if ALL: KID-mammo <= 0.90 x G's value, with paired-bootstrap CI of the difference < 0;
+               KID-dino <= 1.00 x G's value;  recall >= G's recall - 0.05.
+  Validation stage: reference = train-fit images.
+  Test stage (only if validation PASS, run ONCE, fresh noise seeds): reference = TEST images.
+  The test set is then used a second time in the project, so the test-stage CI is
+  widened to 97.5 % (Bonferroni for 2 confirmations).
+
+Mechanism check (descriptive only, not part of PASS):
+  HF energy and saturation of G + noise layer vs real.
+
+If validation fails: S7 is reported as a negative result. No changes to the noise model, no retry.
+
+ADDENDUM 1 (written 2026-10-21 21:40 Asia/Dhaka, AFTER S6 results, BEFORE any S7 code was run)
+-----------------------------------------------------------------------------------------------
+S6 outcome: no validation winner -> G = v_base (as written above). The test set was used once in S6 for the
+pre-specified secondary downstream-classification AUCs (not for any selection). S7 keeps the 97.5 % test CI.
+Implementation details fixed now (they only make the text above exact; nothing is tuned):
+  1. a, b = the LINEAR Poisson-Gaussian fit that PhysicsNLF.fit returns ("linear_poisson_gaussian_only"),
+     fitted on per-image min-max normalised train-fit images (exactly as in S5).
+  2. I = per-image min-max normalised intensity in [0,1] (the domain the fit was made in);
+     sigma(I)^2 = max(a*I + b, 0), used exactly as fitted (no unit conversion, no scaling factor).
+  3. Validation noise seed 7007, test noise seed 9707 (never used before); result rounded back to uint8.
+  4. Validation set = gen_v_base (200 images, S5/S6 noise bank). Test set = gen_t_base (300 images, seed 9025,
+     generated in S6; used there only as synthetic training data in the downstream classifier,
+     never compared with the test images by KID).
+  5. No downstream classifier in S7 (keeps test-set use to the single confirmation).
+  6. S7 is the last experiment of the project, whatever the result.

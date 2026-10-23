@@ -1,0 +1,47 @@
+==============================================================================================================
+S3 REPORT - Fokker-Planck feasibility and lambda selection (validation images only; TEST SET NOT USED)
+==============================================================================================================
+arms: [('s3_m0', 0.0), ('s3_l016', 0.016), ('s3_l054', 0.054), ('s3_l107', 0.107)] | control s3_m0 | decision epoch 42
+
+[1] FP RESIDUAL ON THE PROBE SET  (H = mean over t of r1 r2 / S_ref^2; lower = more FP-consistent)
+  epoch 40 (shared start): H 0.0891 | per t 10:0.042 20:0.031 50:0.053 100:0.078 200:0.149 300:0.182
+  s3_m0      (lam 0): ep41 H 0.0895 | ep42 H 0.0790
+  s3_l016    (lam 0.016): ep41 H 0.0723 | ep42 H 0.1041
+  s3_l054    (lam 0.054): ep41 H 0.0935 | ep42 H 0.0798
+  s3_l107    (lam 0.107): ep41 H 0.0887 | ep42 H 0.2061
+
+  control s3_m0 epoch 42: H 0.0790 | per t 10:0.043 20:0.032 50:0.050 100:0.079 200:0.157 300:0.114
+
+[2] PER-ARM CRITERIA at the decision epoch (vs control, paired)
+  s3_l016 (lam 0.016): R -0.317 CI -0.942..+0.101 | R_jvp -0.214 (FD-vs-JVP err 0.0072) | val loss x1.0439 mse x1.1721 | saturation 0.0176 (control 0.0098) | KID-mammo 0.7928 (control 0.5139)
+      R per t: 10:+0.02 20:-0.02 50:+0.44 100:+0.41 200:-0.82 300:-0.66
+      checks: {'R>=0.10': False, 'CI_lo>0': False, 'R_jvp>0': False, 'val_loss<=1.02': False, 'val_mse<=1.02': False, 'saturation': False, 'kid_mammo': False} -> ELIGIBLE False
+  s3_l054 (lam 0.054): R -0.010 CI -0.465..+0.291 | R_jvp +0.382 (FD-vs-JVP err 0.0119) | val loss x1.0922 mse x1.3796 | saturation 0.0102 (control 0.0098) | KID-mammo 1.1576 (control 0.5139)
+      R per t: 10:+0.18 20:-0.38 50:+0.08 100:+0.45 200:+0.47 300:-0.99
+      checks: {'R>=0.10': False, 'CI_lo>0': False, 'R_jvp>0': True, 'val_loss<=1.02': False, 'val_mse<=1.02': False, 'saturation': True, 'kid_mammo': False} -> ELIGIBLE False
+  s3_l107 (lam 0.107): R -1.608 CI -2.531..-0.924 | R_jvp -0.911 (FD-vs-JVP err 0.0037) | val loss x1.1440 mse x1.5248 | saturation 0.0021 (control 0.0098) | KID-mammo 1.327 (control 0.5139)
+      R per t: 10:+0.03 20:-0.76 50:+0.03 100:-0.16 200:-1.00 300:-5.00
+      checks: {'R>=0.10': False, 'CI_lo>0': False, 'R_jvp>0': False, 'val_loss<=1.02': False, 'val_mse<=1.02': False, 'saturation': True, 'kid_mammo': False} -> ELIGIBLE False
+
+[3] DECISION
+  H1_FAIL -> the FP term did not lower the residual measurably at these lambda
+
+[4] OPTIMISATION (training logs of the S3 epochs; norms before the clip at 1.0)
+  s3_m0 (lam 0): 584 steps | median |g_base| 1.78 | median |g_total| 1.78 | clipped 0.77 (median factor 0.562) | mean |update| 0.0248 | predicted dL_base per step -9.338e-04
+      epoch 41: train loss 0.0317 mse 0.0064 | 14.7 min
+      epoch 42: train loss 0.0322 mse 0.0062 | 14.1 min
+  s3_l016 (lam 0.016): 584 steps | median |g_base| 1.61 | median |g_total| 1.98 | clipped 0.89 (median factor 0.506) | mean |update| nan | predicted dL_base per step +nan
+      FP: median |lam g_FP| 0.657 (x0.408 of base) | mean cos(base, FP) +0.005 | predicted dL_FP(norm) per step +nan (decrease in 0.97 of steps) | training L_FP per epoch {'41': 0.14254759824559166, '42': 0.11072947723126254} | skipped 0
+      epoch 41: train loss 0.0336 mse 0.0081 | 71.2 min
+      epoch 42: train loss 0.0335 mse 0.0075 | 69.8 min
+  s3_l054 (lam 0.054): 584 steps | median |g_base| 1.49 | median |g_total| 3.02 | clipped 0.96 (median factor 0.331) | mean |update| 0.0247 | predicted dL_base per step -5.239e-04
+      FP: median |lam g_FP| 2.08 (x1.38 of base) | mean cos(base, FP) +0.001 | predicted dL_FP(norm) per step -1.412e-01 (decrease in 0.99 of steps) | training L_FP per epoch {'41': 0.1596483321010011, '42': 0.09065748793094928} | skipped 0
+      epoch 41: train loss 0.0359 mse 0.0103 | 73.0 min
+      epoch 42: train loss 0.0351 mse 0.0090 | 72.1 min
+  s3_l107 (lam 0.107): 584 steps | median |g_base| 1.36 | median |g_total| 4.44 | clipped 0.97 (median factor 0.225) | mean |update| 0.0239 | predicted dL_base per step -3.826e-04
+      FP: median |lam g_FP| 3.93 (x2.74 of base) | mean cos(base, FP) +0.002 | predicted dL_FP(norm) per step -1.368e-01 (decrease in 1.00 of steps) | training L_FP per epoch {'41': 0.164588212734239, '42': 0.12877135849336419} | skipped 0
+      epoch 41: train loss 0.0382 mse 0.0123 | 71.0 min
+      epoch 42: train loss 0.0368 mse 0.0103 | 69.6 min
+
+==============================================================================================================
+Send S3_report.txt (or S3_results.zip) and the grid_*.png images back. The LOCK document is written after this.

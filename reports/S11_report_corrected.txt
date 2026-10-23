@@ -1,0 +1,35 @@
+NOTE (2026-10-23): this report was recomputed from the Kaggle prediction files with one labelling fix in s11_stats.py:
+the descriptive secondary label now says 'CI excludes 0' when the CI lies entirely BELOW 0 as well (only S3a changed).
+All numbers are identical to the Kaggle report (S11_report_original_kaggle.txt). Primary endpoints were unaffected.
+
+S11 REPORT - physics dose augmentation for the benign/malignant classifier (rules: S11_preregistration.txt)
+====================================================================================================
+
+CMMD-TRAINED models (5 seeds per arm) - single-seed AUC mean +- SD | 5-seed ensemble AUC
+  val         : R0 0.773+-0.011 | 0.794   R1 0.769+-0.021 | 0.789   R2 0.779+-0.016 | 0.801
+  cmmd_clean  : R0 0.730+-0.008 | 0.741   R1 0.710+-0.015 | 0.724   R2 0.705+-0.018 | 0.716
+  cmmd_dose50 : R0 0.694+-0.009 | 0.705   R1 0.694+-0.010 | 0.706   R2 0.696+-0.009 | 0.708
+  cmmd_dose25 : R0 0.644+-0.019 | 0.648   R1 0.673+-0.006 | 0.685   R2 0.683+-0.008 | 0.696
+  cbis_clean  : R0 0.614+-0.022 | 0.627   R1 0.602+-0.022 | 0.616   R2 0.601+-0.014 | 0.624
+
+CBIS-TRAINED models (5 seeds per arm) - single-seed AUC mean +- SD | 5-seed ensemble AUC
+  val         : R0 0.815+-0.010 | 0.839   R1 0.815+-0.016 | 0.842   R2 0.805+-0.010 | 0.831
+  cmmd_clean  : R0 0.611+-0.014 | 0.626   R1 0.578+-0.024 | 0.588   R2 0.563+-0.024 | 0.574
+  cmmd_dose50 : R0 0.540+-0.014 | 0.551   R1 0.566+-0.022 | 0.571   R2 0.556+-0.030 | 0.568
+  cmmd_dose25 : R0 0.533+-0.020 | 0.535   R1 0.587+-0.024 | 0.596   R2 0.574+-0.018 | 0.588
+  cbis_clean  : R0 0.778+-0.019 | 0.797   R1 0.748+-0.011 | 0.765   R2 0.758+-0.010 | 0.777
+
+PRIMARY ENDPOINTS (98.33 % CI, Bonferroni over 3)
+  P1   cmmd-trained, cmmd_dose25 : AUC R2 - R0 = +0.0486  CI98.33% +0.0156..+0.0836 | same sign in 4/5 seeds -> PASS
+  P2   cmmd-trained, cmmd_dose25 : AUC R2 - R1 = +0.0117  CI98.33% -0.0082..+0.0310 | same sign in 4/5 seeds -> fail
+  P3   cmmd-trained, cmmd_clean  : AUC R2 - R0 = -0.0252  CI98.33% -0.0492..-0.0021 | same sign in 5/5 seeds -> fail (non-inferiority, margin -0.02)
+
+SECONDARY (95 % CI, descriptive)
+  S1a  cmmd-trained, cmmd_dose50 : AUC R2 - R0 = +0.0028  CI95.00% -0.0222..+0.0266 | same sign in 3/5 seeds -> CI includes 0
+  S1b  cmmd-trained, cmmd_dose50 : AUC R2 - R1 = +0.0024  CI95.00% -0.0150..+0.0192 | same sign in 2/5 seeds -> CI includes 0
+  S2a  cmmd-trained, cbis_clean  : AUC R2 - R0 = -0.0034  CI95.00% -0.0290..+0.0239 | same sign in 3/5 seeds -> CI includes 0
+  S2b  cmmd-trained, cbis_clean  : AUC R1 - R0 = -0.0111  CI95.00% -0.0392..+0.0156 | same sign in 2/5 seeds -> CI includes 0
+  S3a  cbis-trained, cmmd_clean  : AUC R2 - R0 = -0.0519  CI95.00% -0.0867..-0.0140 | same sign in 5/5 seeds -> CI excludes 0
+  S3b  cbis-trained, cmmd_clean  : AUC R1 - R0 = -0.0376  CI95.00% -0.0812..+0.0006 | same sign in 4/5 seeds -> CI includes 0
+  S4   cbis-trained, cbis_clean  : AUC R2 - R0 = -0.0201  CI95.00% -0.0435..+0.0040 | same sign in 3/5 seeds -> CI includes 0
+  S5   cmmd-trained, cmmd_dose25 : AUC R1 - R0 = +0.0369  CI95.00% +0.0104..+0.0642 | same sign in 5/5 seeds -> CI excludes 0

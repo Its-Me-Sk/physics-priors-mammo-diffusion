@@ -1,0 +1,83 @@
+====================================================================================================
+PHASE A REPORT (diagnostics only, no training)
+====================================================================================================
+
+[A1] LEAKAGE / DUPLICATES (hard gate)
+  VERDICT: FAIL (leakage)
+  patients train/test/both: 1248 / 234 / 22   images in both splits: 0   test-train near-duplicate pairs (r>0.995): 24 (exactly equal: 18)
+  cache sizes train/test: 2481 / 422   test->train max-corr quantiles: {'0.5': 0.9398, '0.9': 0.964, '0.99': 1.0, '1.0': 1.0}
+  train rows / unique images / repeats / label conflicts: 2864 / 2458 / 406 / 13
+  test  rows / unique images / repeats / label conflicts: 422 / 399 / 23 / 2
+  train-cache duplicate pairs (r>0.995): 485  of which different labels: 15
+  WARNING: train: 406 CSV rows repeat an image (prepare.py adds one copy per abnormality row)
+  WARNING: train: 13 images carry BOTH labels
+  WARNING: train cache: 15 duplicate pairs with different labels
+
+[A2-main] CONDITIONAL-MEAN (JENSEN) TEST on the real network
+  checkpoint base2_w_ep040.pt epoch 40 | 16 test images | real L4 band [0.247, 2.318] | real out-of-band share 0.20
+  t* = 500   (rule: x0_hat out-of-band share <= 0.30 for every grid t up to t*)
+     t | out-of-band share: x0_hat  Bastek  samples  real16 | L4 gap vs real (SD): x0_hat  samples | Jensen gap S(x0_hat)-mean S(sample) (SD): L1   L2   L3   L4 | K
+     5 |   0.19    0.25    0.25    0.25 |   +0.37   +0.32 | -0.00 +0.01 -0.00 +0.05 | 4
+    10 |   0.19    0.19    0.25    0.25 |   +0.51   +0.36 | -0.00 -0.00 -0.03 +0.15 | 4
+    20 |   0.19    0.19    0.25    0.25 |   +0.67   +0.40 | -0.01 -0.02 -0.06 +0.26 | 4
+    50 |   0.19    0.19    0.19    0.25 |   +0.83   +0.39 | -0.02 -0.05 -0.11 +0.44 | 4
+   100 |   0.25    0.19    0.22    0.25 |   +0.88   +0.39 | -0.03 -0.08 -0.14 +0.49 | 4
+   200 |   0.19    0.19    0.22    0.25 |   +0.94   +0.55 | -0.04 -0.21 -0.24 +0.38 | 2
+   300 |   0.25    0.31    0.28    0.25 |   +0.55   +0.64 | -0.04 -0.37 -0.31 -0.09 | 2
+   500 |   0.19    0.25    0.44    0.25 |   +0.09   +0.62 | -0.21 -0.50 -0.26 -0.53 | 2
+
+[A2-25] CONDITIONAL-MEAN (JENSEN) TEST on the real network (25 % data)
+  checkpoint base3_s42_w_ep045.pt epoch 45 | 16 test images | real L4 band [0.258, 2.386] | real out-of-band share 0.20
+  t* = 500   (rule: x0_hat out-of-band share <= 0.30 for every grid t up to t*)
+     t | out-of-band share: x0_hat  Bastek  samples  real16 | L4 gap vs real (SD): x0_hat  samples | Jensen gap S(x0_hat)-mean S(sample) (SD): L1   L2   L3   L4 | K
+     5 |   0.19    0.19    0.19    0.19 |   +0.39   +0.39 | +0.01 +0.03 +0.03 +0.00 | 4
+    10 |   0.19    0.19    0.19    0.19 |   +0.51   +0.42 | +0.01 +0.03 +0.02 +0.10 | 4
+    20 |   0.19    0.19    0.19    0.19 |   +0.62   +0.44 | +0.01 +0.03 -0.00 +0.18 | 4
+    50 |   0.19    0.19    0.19    0.19 |   +0.70   +0.42 | +0.03 +0.01 -0.03 +0.28 | 4
+   100 |   0.25    0.31    0.23    0.19 |   +0.59   +0.46 | +0.06 -0.04 -0.05 +0.13 | 4
+   200 |   0.12    0.31    0.25    0.19 |   -0.01   +0.51 | +0.09 +0.00 +0.16 -0.52 | 2
+   300 |   0.19    0.06    0.22    0.19 |   -0.50   +0.54 | +0.11 +0.34 +0.70 -1.04 | 2
+   500 |   0.12    0.12    0.41    0.19 |   -0.06   +0.58 | -0.06 +2.47 +2.30 -0.64 | 2
+
+[A3] NOISE vs TEXTURE + LESION SIZE (CPU)
+  native JPEG size (median WxH): [2900, 4800]  downsample factor to 256: [11.3, 18.8]
+  resolution test ratios (median): {'flat_512_over_1024': 1.377, 'flat_256_over_512': 1.868, 'all_512_over_1024': 2.424, 'all_256_over_512': 2.667}
+  RESOLUTION VERDICT (flat 256/512; <=0.35 noise-like, >=0.70 texture): texture-dominated
+  edge/flat high-pass variance (median over bins): 3.674
+  calibration: high-pass attenuation expected 0.761 | recovered/expected 1.013 | texture leak clean/known 0.007
+  lesion size at 256 px: {'calc': {'n': 100, 'equiv_diameter_px_median': 19.176824181124665, 'equiv_diameter_px_q10_q90': [6.184421068908309, 44.24967786480103], 'bbox_min_side_px_median': 13.642858359594584, 'fraction_diameter_below_5px': 0.07}, 'mass': {'n': 100, 'equiv_diameter_px_median': 17.12018222773328, 'equiv_diameter_px_q10_q90': [10.509484410846955, 28.48780725238458], 'bbox_min_side_px_median': 15.09208841842161, 'fraction_diameter_below_5px': 0.0}}
+
+[A4] FOKKER-PLANCK RESIDUAL ESTIMATOR on the real network
+  reference: jvp
+  ESTIMATOR VERDICT: fp16 NOT usable; fp32 FD usable (fp32_p0.003)
+  FP residual measurable (z>3) at t = [20, 200, 300, 500, 700] | all t in [10,300]: False
+  fp16: best fp16_p0.01 worst rel.err (t 10-300) 7.382 usable=False | all: {'fp16_p0.001': 598.286, 'fp16_p0.003': 75.955, 'fp16_p0.01': 7.382}
+  fp32: best fp32_p0.003 worst rel.err (t 10-300) 0.085 usable=True | all: {'fp32_p0.001': 0.804, 'fp32_p0.003': 0.085, 'fp32_p0.01': 0.166}
+  fp64 cross-check: {'t': 20, 'rel_diff_jvp_vs_fd64': 0.0005392717439861509}
+  fp64 cross-check: {'t': 100, 'rel_diff_jvp_vs_fd64': 0.002829096486299509}
+     t |     z    rho | term RMS: LHS     u.s      J-term   D2-term | rel.err fp32 p=1e-3 3e-3 1e-2 | fp16 p=1e-3 3e-3 1e-2 | dtau k=2,5 | guided/unguided
+    10 |   2.04 0.201 | 1.49e+03 3.24e+00 3.18e+02 1.36e+03 | 0.005 0.018 0.166 | 12.610 2.262 0.318 | 0.026 0.188 | 1.00
+    20 |   3.10 0.209 | 5.23e+02 3.20e+00 1.17e+02 4.94e+02 | 0.008 0.007 0.069 | 23.814 3.025 0.397 | 0.056 0.136 | 0.98
+    50 |   2.23 0.199 | 1.14e+02 3.16e+00 2.32e+01 1.07e+02 | 0.032 0.004 0.016 | 43.585 7.590 0.839 | 0.051 0.142 | 1.03
+   100 |   2.69 0.251 | 2.67e+01 3.20e+00 5.34e+00 3.10e+01 | 0.103 0.012 0.006 | 116.428 16.473 1.570 | 0.065 0.203 | 1.04
+   200 |   3.30 0.240 | 6.61e+00 3.48e+00 1.27e+00 9.97e+00 | 0.357 0.048 0.007 | 313.590 43.005 5.032 | 0.091 0.216 | 1.03
+   300 |   3.16 0.302 | 3.19e+00 3.90e+00 8.57e-01 6.16e+00 | 0.804 0.085 0.010 | 598.286 75.955 7.382 | 0.143 0.348 | 1.03
+   500 |   3.20 0.639 | 9.82e-01 5.23e+00 8.00e-01 5.33e+00 | 1.634 0.166 0.017 | 970.047 172.542 14.131 | 0.211 0.779 | 1.04
+   700 |   3.10 1.193 | 3.51e-01 7.02e+00 9.28e-01 6.61e+00 | 3.194 0.357 0.033 | 1627.923 211.175 23.216 | 0.380 1.064 | 1.12
+
+[A5] COMPUTE BENCHMARK
+  unit test manual-recompute vs autograd: rel diff 1.0e-13 -> PASS
+  UNet 157.5 M parameters | baseline micro-step 0.568 s, peak 12.2 GB, ~11.7 min/epoch
+  FP setting used: {'p': 0.003, 'precision': 'fp32', 'source': 'A4 (fp16 NOT usable; fp32 FD usable (fp32_p0.003))'}
+  FP term (1 image, 13 evaluations) manual recompute fp16_group1: {'s': 5.175702015558879, 'peak_mem_GB': 6.057849856}
+  FP term (1 image, 13 evaluations) manual recompute fp16_group2: {'s': 4.982229232788086, 'peak_mem_GB': 10.316049408}
+  FP term (1 image, 13 evaluations) manual recompute fp32_group1: {'s': 9.359813133875528, 'peak_mem_GB': 6.084624896}
+  FP term (1 image, 13 evaluations) manual recompute fp32_group2: {'s': 9.373150825500488, 'peak_mem_GB': 9.746611712}
+  FP term full-graph autograd fp16: {'oom': True}
+  cost ratio (FP on 1 image every k micro-steps): {'1': 17.48, '2': 9.24, '4': 5.12, '8': 3.06}
+  est. min/epoch: {'1': 205.2, '2': 108.5, '4': 60.1, '8': 35.9}
+  SEED RULE (k=4): reconsider (cost > 3x)
+  Phase B warm-start file: {'path': '/kaggle/input/notebooks/asefahmedshimanto/notebook64a7f79592/ckpt/base2_last.pt', 'keys': ['args', 'epoch', 'history', 'nlf', 'opt', 'opt_steps', 'scaler', 'step', 'tau', 'unet'], 'epoch': 40, 'step': 49600, 'optimizer_states': 748, 'size_GB': 1.891524523}
+
+====================================================================================================
+Send this whole file (or phaseA_results.zip) back to Claude. Nothing has been decided yet: the LOCK is written after.

@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below and the U24_synthesis paper (Linardos et al., Sci Rep 2026)."
+title: "Physics priors in a conditional diffusion model for mammography - code, pre-registrations and reports"
+authors:
+  - family-names: Shimanto
+    given-names: Asef Ahmed
+    affiliation: "Independent Researcher, Dhaka, Bangladesh"
+    email: itsmeshimantokhan@gmail.com
+license: MIT
+version: "1.0.0"
+date-released: "2026-10-23"
+repository-code: "https://github.com/Its-Me-Sk/physics-priors-mammo-diffusion"
+references:
+  - type: article
+    title: "Evaluating the utility of AI-generated mammography images in breast cancer analysis"
+    authors:
+      - family-names: Linardos
+        given-names: Akis
+      - family-names: Thakur
+        given-names: Siddhesh
+      - family-names: Gastounioti
+        given-names: Aimilia
+      - family-names: Makris
+        given-names: Dimitrios
+      - family-names: Bakas
+        given-names: Spyridon
+    journal: "Scientific Reports"
+    volume: 16
+    start: 29981
+    year: 2026
+    doi: "10.1038/s41598-026-58260-0"
