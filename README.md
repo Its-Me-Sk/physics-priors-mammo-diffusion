@@ -48,6 +48,7 @@ hard-coded config path). All physics terms, evaluation code and data handling of
 | S7 | acquisition-noise (Poisson–Gaussian) layer | rules fixed before the run | `09_…` | `S7_acquisition_noise` | `S7_report.txt` |
 | S8 | **pre-registered** replication on CMMD + held-out test stage (C1–C5) | Results: replication | `10_…`, `11_…` | `S8_replication` | `S8_FINAL_DECISION_SUMMARY.txt`, `S8_session1_report.txt` |
 | S9 | mechanism diagnostics (resolution sweep, noise curves, spectra, saturation, FP gradient) | exploratory | `12_…` | `S9_diagnostics` | `S9_PLUS_report.txt` |
+| S9b | sample-image figures: real vs S8 held-out test images (no new generation; first 3 per class) | exploratory, qualitative | `14_…` | `S9_diagnostics/s9b_samples.py` | `S9b_samples_used.json` |
 | S11 | **pre-registered** physics-based dose-reduction augmentation (P1–P3) | Results: augmentation | `13_…` | `S11_dose_augmentation` | `S11_report_corrected.txt` (+ original) |
 | analysis pack | offline analyses on existing results (correlations, effect sizes, figures C–H) | Results / Discussion | – | `analysis_pack_make_analysis.py` | `analysis_pack_results.txt` |
 
